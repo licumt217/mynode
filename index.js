@@ -1,16 +1,16 @@
-var express = require('express');
-var app = express();
-var cookieParser = require('cookie-parser')
-var util = require('util');
-var fs = require("fs");
+let express = require('express');
+let cookieParser = require('cookie-parser')
+let util = require('util');
+let fs = require("fs");
+let bodyParser = require('body-parser');
+let multer  = require('multer');
+
+let app = express();
 app.use(express.static('public'));
 app.use(cookieParser())
-
-var bodyParser = require('body-parser');
-var multer  = require('multer');
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(multer({ dest: '/tmp/'}).array('image'));
+
 app.post('/file_upload', function (req, res) {
     
     console.log(req.files[0]);  // 上传的文件信息
@@ -44,9 +44,49 @@ app.post('/process_post', urlencodedParser, function (req, res) {
     res.end(JSON.stringify(response));
 })
 
+app.post('/add', urlencodedParser, function (req, res) {
+    
+    // 输出 JSON 格式
+    var response = {
+        "first_name":req.body.first_name,
+        "last_name":req.body.last_name
+    };
+    console.log(response);
+    
+    var MongoClient = require('mongodb').MongoClient;
+    var url = "mongodb://localhost:27017/mymongo";
+    
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        console.log('数据库已创建');
+        var dbase = db.db("mymongo");
+        dbase.createCollection('user', function (err, res) {
+            if (err) throw err;
+            console.log("创建集合!");
+            dbase.collection("user").insertOne(response, function(err, res) {
+                if (err) throw err;
+                console.log("文档插入成功");
+                dbase.collection("user"). find({}).toArray(function(err, result) { // 返回集合中所有数据
+                    if (err) throw err;
+                    console.log(result);
+                    db.close();
+                });
+            });
+        });
+    
+        
+    });
+    
+    
+    
+    res.end(JSON.stringify(response));
+})
 
-app.get('/index.html', function (req, res) {
-    res.sendFile( __dirname + "/" + "index.html" );
+
+
+
+app.get('/index', function (req, res) {
+    res.sendFile( __dirname + "/pages/" + "index.html" );
 })
 
 app.get('/process_get', function (req, res) {

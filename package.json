@@ -15,5 +15,12 @@
   "bugs": {
     "url": "https://github.com/licumt217/mynode/issues"
   },
-  "homepage": "https://github.com/licumt217/mynode#readme"
+  "homepage": "https://github.com/licumt217/mynode#readme",
+  "dependencies": {
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.4",
+    "mongodb": "^3.1.9",
+    "multer": "^1.4.1",
+    "supervisor": "^0.12.0"
+  }
 }
